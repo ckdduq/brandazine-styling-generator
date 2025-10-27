@@ -1,493 +1,682 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Download, Palette, Type, Grid, Move, X } from 'lucide-react';
-
-const BrandazineStylingGenerator = () => {
-  const [products, setProducts] = useState([]);
-  const [layoutCount, setLayoutCount] = useState(10);
-  const [bgColor, setBgColor] = useState('#9CA798');
-  const [subtitle, setSubtitle] = useState('PICK UP ITEM 2025 AW');
-  const [draggedProductIndex, setDraggedProductIndex] = useState(null);
-  const [productPositions, setProductPositions] = useState({});
-  const canvasRef = useRef(null);
-  const fileInputRef = useRef(null);
-
-  const layouts = {
-    5: [
-      { x: 0.08, y: 0.15, w: 0.15, h: 0.15 },
-      { x: 0.08, y: 0.35, w: 0.15, h: 0.15 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.77, y: 0.15, w: 0.15, h: 0.15 },
-      { x: 0.77, y: 0.35, w: 0.15, h: 0.15 }
-    ],
-    6: [
-      { x: 0.08, y: 0.15, w: 0.15, h: 0.15 },
-      { x: 0.08, y: 0.35, w: 0.15, h: 0.15 },
-      { x: 0.08, y: 0.55, w: 0.15, h: 0.15 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.77, y: 0.15, w: 0.15, h: 0.15 },
-      { x: 0.77, y: 0.35, w: 0.15, h: 0.15 }
-    ],
-    7: [
-      { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.32, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.49, w: 0.12, h: 0.12 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.32, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.49, w: 0.12, h: 0.12 }
-    ],
-    8: [
-      { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.3, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.45, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.6, w: 0.12, h: 0.12 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.3, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.45, w: 0.12, h: 0.12 }
-    ],
-    9: [
-      { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.3, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.45, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.6, w: 0.12, h: 0.12 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.3, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.45, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.6, w: 0.12, h: 0.12 }
-    ],
-    10: [
-      { x: 0.08, y: 0.12, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.27, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.42, w: 0.12, h: 0.12 },
-      { x: 0.08, y: 0.57, w: 0.12, h: 0.12 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.48 },
-      { x: 0.4, y: 0.7, w: 0.2, h: 0.08 },
-      { x: 0.77, y: 0.12, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.27, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.42, w: 0.12, h: 0.12 },
-      { x: 0.77, y: 0.57, w: 0.12, h: 0.12 }
-    ],
-    11: [
-      { x: 0.05, y: 0.12, w: 0.11, h: 0.11 },
-      { x: 0.05, y: 0.26, w: 0.11, h: 0.11 },
-      { x: 0.05, y: 0.4, w: 0.11, h: 0.11 },
-      { x: 0.05, y: 0.54, w: 0.11, h: 0.11 },
-      { x: 0.05, y: 0.68, w: 0.11, h: 0.11 },
-      { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
-      { x: 0.84, y: 0.12, w: 0.11, h: 0.11 },
-      { x: 0.84, y: 0.26, w: 0.11, h: 0.11 },
-      { x: 0.84, y: 0.4, w: 0.11, h: 0.11 },
-      { x: 0.84, y: 0.54, w: 0.11, h: 0.11 },
-      { x: 0.84, y: 0.68, w: 0.11, h: 0.11 }
-    ],
-    12: [
-      { x: 0.05, y: 0.12, w: 0.1, h: 0.1 },
-      { x: 0.05, y: 0.25, w: 0.1, h: 0.1 },
-      { x: 0.05, y: 0.38, w: 0.1, h: 0.1 },
-      { x: 0.05, y: 0.51, w: 0.1, h: 0.1 },
-      { x: 0.05, y: 0.64, w: 0.1, h: 0.1 },
-      { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.85, y: 0.12, w: 0.1, h: 0.1 },
-      { x: 0.85, y: 0.25, w: 0.1, h: 0.1 },
-      { x: 0.85, y: 0.38, w: 0.1, h: 0.1 },
-      { x: 0.85, y: 0.51, w: 0.1, h: 0.1 },
-      { x: 0.85, y: 0.64, w: 0.1, h: 0.1 }
-    ],
-    13: [
-      { x: 0.05, y: 0.11, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.23, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.35, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.47, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.59, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.71, w: 0.09, h: 0.09 },
-      { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.86, y: 0.11, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.23, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.35, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.47, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.59, w: 0.09, h: 0.09 }
-    ],
-    14: [
-      { x: 0.05, y: 0.11, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.22, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.33, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.44, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.55, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.66, w: 0.09, h: 0.09 },
-      { x: 0.05, y: 0.77, w: 0.09, h: 0.09 },
-      { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
-      { x: 0.86, y: 0.11, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.22, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.33, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.44, w: 0.09, h: 0.09 },
-      { x: 0.86, y: 0.55, w: 0.09, h: 0.09 }
-    ],
-    15: [
-      { x: 0.04, y: 0.11, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.21, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.31, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.41, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.51, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.61, w: 0.08, h: 0.08 },
-      { x: 0.04, y: 0.71, w: 0.08, h: 0.08 },
-      { x: 0.3, y: 0.25, w: 0.17, h: 0.35 },
-      { x: 0.51, y: 0.25, w: 0.17, h: 0.35 },
-      { x: 0.88, y: 0.11, w: 0.08, h: 0.08 },
-      { x: 0.88, y: 0.21, w: 0.08, h: 0.08 },
-      { x: 0.88, y: 0.31, w: 0.08, h: 0.08 },
-      { x: 0.88, y: 0.41, w: 0.08, h: 0.08 },
-      { x: 0.88, y: 0.51, w: 0.08, h: 0.08 },
-      { x: 0.88, y: 0.61, w: 0.08, h: 0.08 }
-    ]
-  };
-
-  const logoWhite = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
-  const logoBlack = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9ImJsYWNrIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newProducts = [];
-
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const fileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '');
-          const parts = fileName.split('-');
-          const brand = parts[0] || '';
-          const productName = parts.slice(1).join('-') || '';
-
-          newProducts.push({
-            id: Date.now() + Math.random(),
-            image: img,
-            brand: brand.trim(),
-            productName: productName.trim()
-          });
-
-          if (newProducts.length === files.length) {
-            setProducts(prev => [...prev, ...newProducts]);
-          }
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleListDragStart = (index) => {
-    setDraggedProductIndex(index);
-  };
-
-  const handleListDragOver = (e, index) => {
-    e.preventDefault();
-    if (draggedProductIndex === null || draggedProductIndex === index) return;
-
-    const newProducts = [...products];
-    const draggedItem = newProducts[draggedProductIndex];
-    newProducts.splice(draggedProductIndex, 1);
-    newProducts.splice(index, 0, draggedItem);
-
-    setProducts(newProducts);
-    setDraggedProductIndex(index);
-  };
-
-  const handleListDragEnd = () => {
-    setDraggedProductIndex(null);
-  };
-
-  const removeProduct = (id) => {
-    setProducts(products.filter(p => p.id !== id));
-  };
-
-  const getContrastColor = (hexColor) => {
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128 ? '#000000' : '#FFFFFF';
-  };
-
-  const handleCanvasMouseDown = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-
-    const layout = layouts[layoutCount];
-    if (!layout) return;
-
-    for (let i = 0; i < Math.min(products.length, layoutCount); i++) {
-      const pos = productPositions[i] || layout[i];
-      const imgX = pos.x * canvas.width;
-      const imgY = pos.y * canvas.height;
-      const imgW = pos.w * canvas.width;
-      const imgH = pos.h * canvas.height;
-
-      if (x >= imgX && x <= imgX + imgW && y >= imgY && y <= imgY + imgH) {
-        const offsetX = x - imgX;
-        const offsetY = y - imgY;
-        
-        const handleMove = (moveE) => {
-          const newX = (moveE.clientX - rect.left) * scaleX;
-          const newY = (moveE.clientY - rect.top) * scaleY;
-          
-          setProductPositions(prev => ({
-            ...prev,
-            [i]: {
-              x: Math.max(0, Math.min(1 - pos.w, (newX - offsetX) / canvas.width)),
-              y: Math.max(0, Math.min(1 - pos.h, (newY - offsetY) / canvas.height)),
-              w: pos.w,
-              h: pos.h
-            }
-          }));
-        };
-
-        const handleUp = () => {
-          document.removeEventListener('mousemove', handleMove);
-          document.removeEventListener('mouseup', handleUp);
-        };
-
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('mouseup', handleUp);
-        break;
-      }
-    }
-  };
-
-  useEffect(() => {
-    drawCanvas();
-  }, [products, layoutCount, bgColor, subtitle, productPositions]);
-
-  const drawCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const width = 900;
-    const height = 1260;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, width, height);
-
-    const textColor = getContrastColor(bgColor);
-
-    const logo = new Image();
-    logo.src = textColor === '#FFFFFF' ? logoWhite : logoBlack;
-    logo.onload = () => {
-      const logoWidth = 400;
-      const logoHeight = 60;
-      ctx.drawImage(logo, (width - logoWidth) / 2, 40, logoWidth, logoHeight);
-    };
-
-    const layout = layouts[layoutCount];
-    if (layout && products.length > 0) {
-      products.slice(0, layoutCount).forEach((product, index) => {
-        const pos = productPositions[index] || layout[index];
-        if (pos) {
-          const x = pos.x * width;
-          const y = pos.y * height;
-          const w = pos.w * width;
-          const h = pos.h * height;
-
-          ctx.drawImage(product.image, x, y, w, h);
-
-          ctx.fillStyle = textColor;
-          ctx.font = 'bold 20px Arial';
-          ctx.fillText(String.fromCharCode(97 + index) + '.', x, y - 10);
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brandazine 스타일링 이미지 생성기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      });
-    }
 
-    const textStartY = height - 280;
-    ctx.fillStyle = textColor;
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(subtitle.toUpperCase(), 100, textStartY);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f3f4f6;
+            padding: 2rem;
+        }
 
-    ctx.font = '15px Arial';
-    products.slice(0, layoutCount).forEach((product, index) => {
-      const label = String.fromCharCode(97 + index);
-      const text = `${label}. ${product.brand.toUpperCase()} ・・・ ${product.productName.toUpperCase()}`;
-      ctx.fillText(text, 100, textStartY + 35 + index * 22);
-    });
-  };
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-  const downloadImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+        h1 {
+            font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
 
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `brandazine-styling-${Date.now()}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  };
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
 
-  const resetPositions = () => {
-    setProductPositions({});
-  };
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Brandazine 스타일링 이미지 생성기</h1>
+        .panel {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="color"] {
+            width: 5rem;
+            height: 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .help-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .product-list {
+            max-height: 16rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            cursor: move;
+            transition: background 0.2s;
+        }
+
+        .product-item:hover {
+            background: #f3f4f6;
+        }
+
+        .product-item.dragging {
+            opacity: 0.5;
+        }
+
+        .product-label {
+            font-weight: bold;
+            color: #4b5563;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-brand {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .product-name {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .btn-remove {
+            color: #ef4444;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 1.2rem;
+        }
+
+        .btn-remove:hover {
+            color: #dc2626;
+        }
+
+        .preview-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        #canvas {
+            width: 100%;
+            height: auto;
+            max-height: 800px;
+            display: block;
+            cursor: move;
+        }
+
+        .space-y {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Brandazine 스타일링 이미지 생성기</h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Upload className="w-5 h-5" />
-                상품 이미지 업로드
-              </h2>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"
-              >
-                이미지 선택 (브랜드-상품명.jpg)
-              </button>
-              <p className="text-sm text-gray-500 mt-2">
-                파일명 형식: 브랜드명-상품명.jpg (예: NIKE-Air Max.jpg)
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Grid className="w-5 h-5" />
-                레이아웃 선택
-              </h2>
-              <select
-                value={layoutCount}
-                onChange={(e) => {
-                  setLayoutCount(Number(e.target.value));
-                  setProductPositions({});
-                }}
-                className="w-full border border-gray-300 rounded-lg p-2"
-              >
-                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(num => (
-                  <option key={num} value={num}>{num}개 상품</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Type className="w-5 h-5" />
-                부제목 입력
-              </h2>
-              <input
-                type="text"
-                value={subtitle}
-                onChange={(e) => setSubtitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2"
-                placeholder="PICK UP ITEM 2025 AW"
-              />
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                배경색 선택
-              </h2>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={bgColor}
-                  onChange={(e) => setBgColor(e.target.value)}
-                  className="w-20 h-10 rounded cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={bgColor}
-                  onChange={(e) => setBgColor(e.target.value)}
-                  className="flex-1 border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Move className="w-5 h-5" />
-                상품 순서 조정 (드래그)
-              </h2>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {products.map((product, index) => (
-                  <div
-                    key={product.id}
-                    draggable
-                    onDragStart={() => handleListDragStart(index)}
-                    onDragOver={(e) => handleListDragOver(e, index)}
-                    onDragEnd={handleListDragEnd}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition"
-                  >
-                    <span className="font-bold text-gray-600">{String.fromCharCode(97 + index)}.</span>
-                    <div className="flex-1">
-                      <div className="font-semibold text-sm">{product.brand}</div>
-                      <div className="text-xs text-gray-600">{product.productName}</div>
-                    </div>
-                    <button
-                      onClick={() => removeProduct(product.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
+        <div class="grid">
+            <div class="space-y">
+                <div class="panel">
+                    <h2>📤 상품 이미지 업로드</h2>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        이미지 선택 (브랜드-상품명.jpg)
                     </button>
-                  </div>
-                ))}
-              </div>
+                    <p class="help-text">파일명 형식: 브랜드명-상품명.jpg (예: NIKE-Air Max.jpg)</p>
+                </div>
+
+                <div class="panel">
+                    <h2>🔲 레이아웃 선택</h2>
+                    <select id="layoutSelect">
+                        <option value="5">5개 상품</option>
+                        <option value="6">6개 상품</option>
+                        <option value="7">7개 상품</option>
+                        <option value="8">8개 상품</option>
+                        <option value="9">9개 상품</option>
+                        <option value="10" selected>10개 상품</option>
+                        <option value="11">11개 상품</option>
+                        <option value="12">12개 상품</option>
+                        <option value="13">13개 상품</option>
+                        <option value="14">14개 상품</option>
+                        <option value="15">15개 상품</option>
+                    </select>
+                </div>
+
+                <div class="panel">
+                    <h2>✏️ 부제목 입력</h2>
+                    <input type="text" id="subtitleInput" value="PICK UP ITEM 2025 AW" placeholder="PICK UP ITEM 2025 AW">
+                </div>
+
+                <div class="panel">
+                    <h2>🎨 배경색 선택</h2>
+                    <div class="color-picker-group">
+                        <input type="color" id="colorPicker" value="#9CA798">
+                        <input type="text" id="colorText" value="#9CA798">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>↕️ 상품 순서 조정 (드래그)</h2>
+                    <div id="productList" class="product-list"></div>
+                </div>
+
+                <button class="btn btn-warning" onclick="resetPositions()">
+                    배치 위치 초기화
+                </button>
+
+                <button class="btn btn-success" id="downloadBtn" disabled onclick="downloadImage()">
+                    ⬇️ 이미지 다운로드
+                </button>
             </div>
 
-            <button
-              onClick={resetPositions}
-              className="w-full bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition"
-            >
-              배치 위치 초기화
-            </button>
-
-            <button
-              onClick={downloadImage}
-              disabled={products.length === 0}
-              className="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              이미지 다운로드
-            </button>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">미리보기 (상품을 드래그해서 위치 조정 가능)</h2>
-            <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-              <canvas
-                ref={canvasRef}
-                onMouseDown={handleCanvasMouseDown}
-                className="w-full h-auto cursor-move"
-                style={{ maxHeight: '800px' }}
-              />
+            <div class="panel">
+                <h2>미리보기 (상품을 드래그해서 위치 조정 가능)</h2>
+                <div class="preview-container">
+                    <canvas id="canvas"></canvas>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  );
-};
 
-export default BrandazineStylingGenerator;
+    <script>
+        var products = [];
+        var draggedIndex = null;
+        var productPositions = {};
+        var isDraggingOnCanvas = false;
+        var draggedProductIndex = null;
+
+        var layouts = {
+            "5": [
+                { x: 0.08, y: 0.15, w: 0.15, h: 0.15 },
+                { x: 0.08, y: 0.35, w: 0.15, h: 0.15 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.77, y: 0.15, w: 0.15, h: 0.15 },
+                { x: 0.77, y: 0.35, w: 0.15, h: 0.15 }
+            ],
+            "6": [
+                { x: 0.08, y: 0.15, w: 0.15, h: 0.15 },
+                { x: 0.08, y: 0.35, w: 0.15, h: 0.15 },
+                { x: 0.08, y: 0.55, w: 0.15, h: 0.15 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.77, y: 0.15, w: 0.15, h: 0.15 },
+                { x: 0.77, y: 0.35, w: 0.15, h: 0.15 }
+            ],
+            "7": [
+                { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.32, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.49, w: 0.12, h: 0.12 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.32, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.49, w: 0.12, h: 0.12 }
+            ],
+            "8": [
+                { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.3, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.45, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.6, w: 0.12, h: 0.12 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.3, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.45, w: 0.12, h: 0.12 }
+            ],
+            "9": [
+                { x: 0.08, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.3, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.45, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.6, w: 0.12, h: 0.12 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.77, y: 0.15, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.3, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.45, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.6, w: 0.12, h: 0.12 }
+            ],
+            "10": [
+                { x: 0.08, y: 0.12, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.27, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.42, w: 0.12, h: 0.12 },
+                { x: 0.08, y: 0.57, w: 0.12, h: 0.12 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.48 },
+                { x: 0.4, y: 0.7, w: 0.2, h: 0.08 },
+                { x: 0.77, y: 0.12, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.27, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.42, w: 0.12, h: 0.12 },
+                { x: 0.77, y: 0.57, w: 0.12, h: 0.12 }
+            ],
+            "11": [
+                { x: 0.05, y: 0.12, w: 0.11, h: 0.11 },
+                { x: 0.05, y: 0.26, w: 0.11, h: 0.11 },
+                { x: 0.05, y: 0.4, w: 0.11, h: 0.11 },
+                { x: 0.05, y: 0.54, w: 0.11, h: 0.11 },
+                { x: 0.05, y: 0.68, w: 0.11, h: 0.11 },
+                { x: 0.4, y: 0.2, w: 0.2, h: 0.4 },
+                { x: 0.84, y: 0.12, w: 0.11, h: 0.11 },
+                { x: 0.84, y: 0.26, w: 0.11, h: 0.11 },
+                { x: 0.84, y: 0.4, w: 0.11, h: 0.11 },
+                { x: 0.84, y: 0.54, w: 0.11, h: 0.11 },
+                { x: 0.84, y: 0.68, w: 0.11, h: 0.11 }
+            ],
+            "12": [
+                { x: 0.05, y: 0.12, w: 0.1, h: 0.1 },
+                { x: 0.05, y: 0.25, w: 0.1, h: 0.1 },
+                { x: 0.05, y: 0.38, w: 0.1, h: 0.1 },
+                { x: 0.05, y: 0.51, w: 0.1, h: 0.1 },
+                { x: 0.05, y: 0.64, w: 0.1, h: 0.1 },
+                { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.85, y: 0.12, w: 0.1, h: 0.1 },
+                { x: 0.85, y: 0.25, w: 0.1, h: 0.1 },
+                { x: 0.85, y: 0.38, w: 0.1, h: 0.1 },
+                { x: 0.85, y: 0.51, w: 0.1, h: 0.1 },
+                { x: 0.85, y: 0.64, w: 0.1, h: 0.1 }
+            ],
+            "13": [
+                { x: 0.05, y: 0.11, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.23, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.35, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.47, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.59, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.71, w: 0.09, h: 0.09 },
+                { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.86, y: 0.11, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.23, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.35, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.47, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.59, w: 0.09, h: 0.09 }
+            ],
+            "14": [
+                { x: 0.05, y: 0.11, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.22, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.33, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.44, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.55, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.66, w: 0.09, h: 0.09 },
+                { x: 0.05, y: 0.77, w: 0.09, h: 0.09 },
+                { x: 0.3, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.52, y: 0.25, w: 0.18, h: 0.35 },
+                { x: 0.86, y: 0.11, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.22, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.33, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.44, w: 0.09, h: 0.09 },
+                { x: 0.86, y: 0.55, w: 0.09, h: 0.09 }
+            ],
+            "15": [
+                { x: 0.04, y: 0.11, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.21, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.31, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.41, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.51, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.61, w: 0.08, h: 0.08 },
+                { x: 0.04, y: 0.71, w: 0.08, h: 0.08 },
+                { x: 0.3, y: 0.25, w: 0.17, h: 0.35 },
+                { x: 0.51, y: 0.25, w: 0.17, h: 0.35 },
+                { x: 0.88, y: 0.11, w: 0.08, h: 0.08 },
+                { x: 0.88, y: 0.21, w: 0.08, h: 0.08 },
+                { x: 0.88, y: 0.31, w: 0.08, h: 0.08 },
+                { x: 0.88, y: 0.41, w: 0.08, h: 0.08 },
+                { x: 0.88, y: 0.51, w: 0.08, h: 0.08 },
+                { x: 0.88, y: 0.61, w: 0.08, h: 0.08 }
+            ]
+        };
+
+        var logoWhiteData = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
+        var logoBlackData = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9ImJsYWNrIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
+
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        document.getElementById('layoutSelect').addEventListener('change', function() {
+            productPositions = {};
+            drawCanvas();
+        });
+        document.getElementById('subtitleInput').addEventListener('input', drawCanvas);
+        document.getElementById('colorPicker').addEventListener('input', function(e) {
+            document.getElementById('colorText').value = e.target.value;
+            drawCanvas();
+        });
+        document.getElementById('colorText').addEventListener('input', function(e) {
+            document.getElementById('colorPicker').value = e.target.value;
+            drawCanvas();
+        });
+
+        var canvas = document.getElementById('canvas');
+        canvas.addEventListener('mousedown', handleCanvasMouseDown);
+
+        function handleFileUpload(e) {
+            var files = Array.prototype.slice.call(e.target.files);
+            var loaded = 0;
+
+            for (var i = 0; i < files.length; i++) {
+                (function(file) {
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        var img = new Image();
+                        img.onload = function() {
+                            var fileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '');
+                            var parts = fileName.split('-');
+                            var brand = parts[0] || '';
+                            var productName = parts.slice(1).join('-') || '';
+
+                            products.push({
+                                id: Date.now() + Math.random(),
+                                image: img,
+                                brand: brand.trim(),
+                                productName: productName.trim()
+                            });
+
+                            loaded++;
+                            if (loaded === files.length) {
+                                updateProductList();
+                                drawCanvas();
+                                document.getElementById('downloadBtn').disabled = false;
+                            }
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                })(files[i]);
+            }
+        }
+
+        function updateProductList() {
+            var list = document.getElementById('productList');
+            list.innerHTML = '';
+
+            for (var i = 0; i < products.length; i++) {
+                (function(index) {
+                    var product = products[index];
+                    var item = document.createElement('div');
+                    item.className = 'product-item';
+                    item.draggable = true;
+                    item.dataset.index = index;
+
+                    item.innerHTML = '<span class="product-label">' + String.fromCharCode(97 + index) + '.</span>' +
+                        '<div class="product-info">' +
+                        '<div class="product-brand">' + product.brand + '</div>' +
+                        '<div class="product-name">' + product.productName + '</div>' +
+                        '</div>' +
+                        '<button class="btn-remove" onclick="removeProduct(' + index + ')">✕</button>';
+
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragover', handleDragOver);
+                    item.addEventListener('drop', handleDrop);
+                    item.addEventListener('dragend', handleDragEnd);
+
+                    list.appendChild(item);
+                })(i);
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedIndex = parseInt(e.target.dataset.index);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            var dropIndex = parseInt(e.currentTarget.dataset.index);
+
+            if (draggedIndex !== null && draggedIndex !== dropIndex) {
+                var draggedItem = products[draggedIndex];
+                products.splice(draggedIndex, 1);
+                products.splice(dropIndex, 0, draggedItem);
+
+                updateProductList();
+                drawCanvas();
+            }
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedIndex = null;
+        }
+
+        function removeProduct(index) {
+            products.splice(index, 1);
+            updateProductList();
+            drawCanvas();
+
+            if (products.length === 0) {
+                document.getElementById('downloadBtn').disabled = true;
+            }
+        }
+
+        function handleCanvasMouseDown(e) {
+            var canvas = document.getElementById('canvas');
+            var rect = canvas.getBoundingClientRect();
+            var scaleX = canvas.width / rect.width;
+            var scaleY = canvas.height / rect.height;
+            var x = (e.clientX - rect.left) * scaleX;
+            var y = (e.clientY - rect.top) * scaleY;
+
+            var layoutCount = document.getElementById('layoutSelect').value;
+            var layout = layouts[layoutCount];
+            if (!layout) return;
+
+            for (var i = 0; i < Math.min(products.length, parseInt(layoutCount)); i++) {
+                var pos = productPositions[i] || layout[i];
+                var imgX = pos.x * canvas.width;
+                var imgY = pos.y * canvas.height;
+                var imgW = pos.w * canvas.width;
+                var imgH = pos.h * canvas.height;
+
+                if (x >= imgX && x <= imgX + imgW && y >= imgY && y <= imgY + imgH) {
+                    var offsetX = x - imgX;
+                    var offsetY = y - imgY;
+                    
+                    var currentIndex = i;
+                    
+                    var handleMove = function(moveE) {
+                        var newX = (moveE.clientX - rect.left) * scaleX;
+                        var newY = (moveE.clientY - rect.top) * scaleY;
+                        
+                        var newPos = {
+                            x: Math.max(0, Math.min(1 - pos.w, (newX - offsetX) / canvas.width)),
+                            y: Math.max(0, Math.min(1 - pos.h, (newY - offsetY) / canvas.height)),
+                            w: pos.w,
+                            h: pos.h
+                        };
+                        
+                        productPositions[currentIndex] = newPos;
+                        drawCanvas();
+                    };
+
+                    var handleUp = function() {
+                        document.removeEventListener('mousemove', handleMove);
+                        document.removeEventListener('mouseup', handleUp);
+                    };
+
+                    document.addEventListener('mousemove', handleMove);
+                    document.addEventListener('mouseup', handleUp);
+                    break;
+                }
+            }
+        }
+
+        function getContrastColor(hexColor) {
+            var r = parseInt(hexColor.slice(1, 3), 16);
+            var g = parseInt(hexColor.slice(3, 5), 16);
+            var b = parseInt(hexColor.slice(5, 7), 16);
+            var brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 128 ? '#000000' : '#FFFFFF';
+        }
+
+        function drawCanvas() {
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            var width = 900;
+            var height = 1260;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            var bgColor = document.getElementById('colorText').value;
+            var subtitle = document.getElementById('subtitleInput').value;
+            var layoutCount = document.getElementById('layoutSelect').value;
+
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
+
+            var textColor = getContrastColor(bgColor);
+
+            var logo = new Image();
+            logo.src = textColor === '#FFFFFF' ? logoWhiteData : logoBlackData;
+            logo.onload = function() {
+                var logoWidth = 400;
+                var logoHeight = 60;
+                ctx.drawImage(logo, (width - logoWidth) / 2, 40, logoWidth, logoHeight);
+            };
+
+            var layout = layouts[layoutCount];
+            if (layout && products.length > 0) {
+                var maxProducts = Math.min(products.length, parseInt(layoutCount));
+                for (var i = 0; i < maxProducts; i++) {
+                    var pos = productPositions[i] || layout[i];
+                    if (pos) {
+                        var product = products[i];
+                        var x = pos.x * width;
+                        var y = pos.y * height;
+                        var w = pos.w * width;
+                        var h = pos.h * height;
+
+                        ctx.drawImage(product.image, x, y, w, h);
+
+                        ctx.fillStyle = textColor;
+                        ctx.font = 'bold 20px Arial';
+                        ctx.fillText(String.fromCharCode(97 + i) + '.', x, y - 10);
+                    }
+                }
+            }
+
+            var textStartY = height - 280;
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(subtitle.toUpperCase(), 100, textStartY);
+
+            ctx.font = '15px Arial';
+            var maxProducts2 = Math.min(products.length, parseInt(layoutCount));
+            for (var j = 0; j < maxProducts2; j++) {
+                var product2 = products[j];
+                var label = String.fromCharCode(97 + j);
+                var text = label + '. ' + product2.brand.toUpperCase() + ' ・・・ ' + product2.productName.toUpperCase();
+                ctx.fillText(text, 100, textStartY + 35 + j * 22);
+            }
+        }
+
+        function resetPositions() {
+            productPositions = {};
+            drawCanvas();
+        }
+
+        function downloadImage() {
+            var canvas = document.getElementById('canvas');
+            canvas.toBlob(function(blob) {
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'brandazine-styling-' + Date.now() + '.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        drawCanvas();
+    </script>
+</body>
+</html>
