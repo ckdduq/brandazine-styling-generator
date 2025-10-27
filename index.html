@@ -290,6 +290,15 @@
                 </div>
 
                 <div class="panel">
+                    <h2 id="logoTitle">🖼️ ロゴカラー選択</h2>
+                    <select id="logoSelect" onchange="changeLogoColor()">
+                        <option value="auto" data-ko="자동 (배경색에 맞춰)" data-ja="自動（背景色に合わせる）">自動（背景色に合わせる）</option>
+                        <option value="white" data-ko="흰색 로고" data-ja="白ロゴ">白ロゴ</option>
+                        <option value="black" data-ko="検은색 로고" data-ja="黒ロゴ">黒ロゴ</option>
+                    </select>
+                </div>
+
+                <div class="panel">
                     <h2 id="orderTitle">↕️ 商品順序調整 (ドラッグ)</h2>
                     <div id="productList" class="product-list"></div>
                 </div>
@@ -317,6 +326,10 @@
         var products = [];
         var draggedIndex = null;
         var productPositions = {};
+        var currentLogoColor = 'auto';
+
+        var logoWhiteUrl = 'brandazine logo v2_white.png';
+        var logoBlackUrl = 'brandazine logo v2.png';
 
         var translations = {
             ko: {
@@ -327,6 +340,7 @@
                 layoutTitle: '🔲 레이아웃 선택',
                 subtitleTitle: '✏️ 부제목 입력',
                 colorTitle: '🎨 배경색 선택',
+                logoTitle: '🖼️ 로고 색상 선택',
                 orderTitle: '↕️ 상품 순서 조정 (드래그)',
                 resetBtn: '배치 위치 초기화',
                 downloadText: '이미지 다운로드',
@@ -340,6 +354,7 @@
                 layoutTitle: '🔲 レイアウト選択',
                 subtitleTitle: '✏️ サブタイトル入力',
                 colorTitle: '🎨 背景色選択',
+                logoTitle: '🖼️ ロゴカラー選択',
                 orderTitle: '↕️ 商品順序調整 (ドラッグ)',
                 resetBtn: '配置位置初期化',
                 downloadText: '画像ダウンロード',
@@ -361,15 +376,28 @@
             document.getElementById('layoutTitle').innerHTML = t.layoutTitle;
             document.getElementById('subtitleTitle').innerHTML = t.subtitleTitle;
             document.getElementById('colorTitle').innerHTML = t.colorTitle;
+            document.getElementById('logoTitle').innerHTML = t.logoTitle;
             document.getElementById('orderTitle').innerHTML = t.orderTitle;
             document.getElementById('resetBtn').textContent = t.resetBtn;
             document.getElementById('downloadText').textContent = t.downloadText;
             document.getElementById('previewTitle').textContent = t.previewTitle;
             
-            var options = document.querySelectorAll('#layoutSelect option');
-            options.forEach(function(option) {
+            var layoutOptions = document.querySelectorAll('#layoutSelect option');
+            layoutOptions.forEach(function(option) {
                 option.textContent = option.getAttribute('data-' + lang);
             });
+
+            var logoOptions = document.querySelectorAll('#logoSelect option');
+            logoOptions.forEach(function(option) {
+                if (option.getAttribute('data-' + lang)) {
+                    option.textContent = option.getAttribute('data-' + lang);
+                }
+            });
+        }
+
+        function changeLogoColor() {
+            currentLogoColor = document.getElementById('logoSelect').value;
+            drawCanvas();
         }
 
         var layouts = {
@@ -506,9 +534,6 @@
                 { x: 0.88, y: 0.61, w: 0.08, h: 0.08 }
             ]
         };
-
-        var logoWhiteData = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
-        var logoBlackData = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9ImJsYWNrIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5icmFuZGF6aW5lPC90ZXh0Pjwvc3ZnPg==';
 
         document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         document.getElementById('layoutSelect').addEventListener('change', function() {
@@ -710,10 +735,17 @@
             var textColor = getContrastColor(bgColor);
 
             var logo = new Image();
-            logo.src = textColor === '#FFFFFF' ? logoWhiteData : logoBlackData;
+            if (currentLogoColor === 'white') {
+                logo.src = logoWhiteUrl;
+            } else if (currentLogoColor === 'black') {
+                logo.src = logoBlackUrl;
+            } else {
+                logo.src = textColor === '#FFFFFF' ? logoWhiteUrl : logoBlackUrl;
+            }
+
             logo.onload = function() {
-                var logoWidth = 400;
-                var logoHeight = 60;
+                var logoHeight = 50;
+                var logoWidth = logo.width * (logoHeight / logo.height);
                 ctx.drawImage(logo, (width - logoWidth) / 2, 40, logoWidth, logoHeight);
             };
 
