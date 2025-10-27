@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brandazine 스타일링 이미지 생성기</title>
+    <title>Brandazine スタイリング画像生成機</title>
     <style>
         * {
             margin: 0;
@@ -22,10 +22,45 @@
             margin: 0 auto;
         }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
         h1 {
             font-size: 2rem;
             color: #1f2937;
-            margin-bottom: 2rem;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: transparent;
+            color: #6b7280;
+        }
+
+        .lang-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: #f3f4f6;
         }
 
         .grid {
@@ -205,43 +240,49 @@
 </head>
 <body>
     <div class="container">
-        <h1>Brandazine 스타일링 이미지 생성기</h1>
+        <div class="header">
+            <h1 id="mainTitle">Brandazine スタイリング画像生成機</h1>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="setLanguage('ko')" id="btnKo">한국어</button>
+                <button class="lang-btn active" onclick="setLanguage('ja')" id="btnJa">日本語</button>
+            </div>
+        </div>
         
         <div class="grid">
             <div class="space-y">
                 <div class="panel">
-                    <h2>📤 상품 이미지 업로드</h2>
+                    <h2 id="uploadTitle">📤 商品画像アップロード</h2>
                     <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
-                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
-                        이미지 선택 (브랜드-상품명.jpg)
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" id="uploadBtn">
+                        画像を選択 (ブランド-商品名.jpg)
                     </button>
-                    <p class="help-text">파일명 형식: 브랜드명-상품명.jpg (예: NIKE-Air Max.jpg)</p>
+                    <p class="help-text" id="uploadHelp">ファイル名形式: ブランド名-商品名.jpg (例: NIKE-Air Max.jpg)</p>
                 </div>
 
                 <div class="panel">
-                    <h2>🔲 레이아웃 선택</h2>
+                    <h2 id="layoutTitle">🔲 レイアウト選択</h2>
                     <select id="layoutSelect">
-                        <option value="5">5개 상품</option>
-                        <option value="6">6개 상품</option>
-                        <option value="7">7개 상품</option>
-                        <option value="8">8개 상품</option>
-                        <option value="9">9개 상품</option>
-                        <option value="10" selected>10개 상품</option>
-                        <option value="11">11개 상품</option>
-                        <option value="12">12개 상품</option>
-                        <option value="13">13개 상품</option>
-                        <option value="14">14개 상품</option>
-                        <option value="15">15개 상품</option>
+                        <option value="5" data-ko="5개 상품" data-ja="5個商品">5個商品</option>
+                        <option value="6" data-ko="6개 상품" data-ja="6個商品">6個商品</option>
+                        <option value="7" data-ko="7개 상품" data-ja="7個商品">7個商品</option>
+                        <option value="8" data-ko="8개 상품" data-ja="8個商品">8個商品</option>
+                        <option value="9" data-ko="9개 상품" data-ja="9個商品">9個商品</option>
+                        <option value="10" selected data-ko="10개 상품" data-ja="10個商品">10個商品</option>
+                        <option value="11" data-ko="11개 상품" data-ja="11個商品">11個商品</option>
+                        <option value="12" data-ko="12개 상품" data-ja="12個商品">12個商品</option>
+                        <option value="13" data-ko="13개 상품" data-ja="13個商品">13個商品</option>
+                        <option value="14" data-ko="14개 상품" data-ja="14個商品">14個商品</option>
+                        <option value="15" data-ko="15개 상품" data-ja="15個商品">15個商品</option>
                     </select>
                 </div>
 
                 <div class="panel">
-                    <h2>✏️ 부제목 입력</h2>
+                    <h2 id="subtitleTitle">✏️ サブタイトル入力</h2>
                     <input type="text" id="subtitleInput" value="PICK UP ITEM 2025 AW" placeholder="PICK UP ITEM 2025 AW">
                 </div>
 
                 <div class="panel">
-                    <h2>🎨 배경색 선택</h2>
+                    <h2 id="colorTitle">🎨 背景色選択</h2>
                     <div class="color-picker-group">
                         <input type="color" id="colorPicker" value="#9CA798">
                         <input type="text" id="colorText" value="#9CA798">
@@ -249,21 +290,21 @@
                 </div>
 
                 <div class="panel">
-                    <h2>↕️ 상품 순서 조정 (드래그)</h2>
+                    <h2 id="orderTitle">↕️ 商品順序調整 (ドラッグ)</h2>
                     <div id="productList" class="product-list"></div>
                 </div>
 
-                <button class="btn btn-warning" onclick="resetPositions()">
-                    배치 위치 초기화
+                <button class="btn btn-warning" onclick="resetPositions()" id="resetBtn">
+                    配置位置初期化
                 </button>
 
                 <button class="btn btn-success" id="downloadBtn" disabled onclick="downloadImage()">
-                    ⬇️ 이미지 다운로드
+                    ⬇️ <span id="downloadText">画像ダウンロード</span>
                 </button>
             </div>
 
             <div class="panel">
-                <h2>미리보기 (상품을 드래그해서 위치 조정 가능)</h2>
+                <h2 id="previewTitle">プレビュー (商品をドラッグして位置調整可能)</h2>
                 <div class="preview-container">
                     <canvas id="canvas"></canvas>
                 </div>
@@ -272,11 +313,64 @@
     </div>
 
     <script>
+        var currentLang = 'ja';
         var products = [];
         var draggedIndex = null;
         var productPositions = {};
-        var isDraggingOnCanvas = false;
-        var draggedProductIndex = null;
+
+        var translations = {
+            ko: {
+                mainTitle: 'Brandazine 스타일링 이미지 생성기',
+                uploadTitle: '📤 상품 이미지 업로드',
+                uploadBtn: '이미지 선택 (브랜드-상품명.jpg)',
+                uploadHelp: '파일명 형식: 브랜드명-상품명.jpg (예: NIKE-Air Max.jpg)',
+                layoutTitle: '🔲 레이아웃 선택',
+                subtitleTitle: '✏️ 부제목 입력',
+                colorTitle: '🎨 배경색 선택',
+                orderTitle: '↕️ 상품 순서 조정 (드래그)',
+                resetBtn: '배치 위치 초기화',
+                downloadText: '이미지 다운로드',
+                previewTitle: '미리보기 (상품을 드래그해서 위치 조정 가능)'
+            },
+            ja: {
+                mainTitle: 'Brandazine スタイリング画像生成機',
+                uploadTitle: '📤 商品画像アップロード',
+                uploadBtn: '画像を選択 (ブランド-商品名.jpg)',
+                uploadHelp: 'ファイル名形式: ブランド名-商品名.jpg (例: NIKE-Air Max.jpg)',
+                layoutTitle: '🔲 レイアウト選択',
+                subtitleTitle: '✏️ サブタイトル入力',
+                colorTitle: '🎨 背景色選択',
+                orderTitle: '↕️ 商品順序調整 (ドラッグ)',
+                resetBtn: '配置位置初期化',
+                downloadText: '画像ダウンロード',
+                previewTitle: 'プレビュー (商品をドラッグして位置調整可能)'
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            document.getElementById('btnKo').classList.toggle('active', lang === 'ko');
+            document.getElementById('btnJa').classList.toggle('active', lang === 'ja');
+            
+            var t = translations[lang];
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('uploadTitle').innerHTML = t.uploadTitle;
+            document.getElementById('uploadBtn').textContent = t.uploadBtn;
+            document.getElementById('uploadHelp').textContent = t.uploadHelp;
+            document.getElementById('layoutTitle').innerHTML = t.layoutTitle;
+            document.getElementById('subtitleTitle').innerHTML = t.subtitleTitle;
+            document.getElementById('colorTitle').innerHTML = t.colorTitle;
+            document.getElementById('orderTitle').innerHTML = t.orderTitle;
+            document.getElementById('resetBtn').textContent = t.resetBtn;
+            document.getElementById('downloadText').textContent = t.downloadText;
+            document.getElementById('previewTitle').textContent = t.previewTitle;
+            
+            var options = document.querySelectorAll('#layoutSelect option');
+            options.forEach(function(option) {
+                option.textContent = option.getAttribute('data-' + lang);
+            });
+        }
 
         var layouts = {
             "5": [
